@@ -1,64 +1,73 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
+# Setup ReactJs in Laravel 8
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+   ## Create new react app in the ``` resources ``` directoty
+   ``` 
+   npx create-react-app react-app
+   ```
+   ![image](https://user-images.githubusercontent.com/107058157/174471088-8d49e273-2cd4-49f0-8107-529d7a65e5cf.png)
+   
+   > Remove the ``` node_modules ``` folder into react-app
+   ## Config the package.json in laravel app
+   - Copy the ``` dependencies ``` in packages.json file in the ``` react-app ``` directory 
+   - Then paste it into the ``` package.json ``` in the ``` laravel ``` directory (into ``` devDependencies ```
+   - Run the following code in the ``` recources ``` directory 
+     ```
+     npm install
+     ```
+   ## Config webpack.mix.js
+   - Paste the follwing code into webpack.mix.js
+   ```javascript
+   const mix = require('laravel-mix');
+const { chunk } = require('lodash');
 
-## About Laravel
+/*
+ |--------------------------------------------------------------------------
+ | Mix Asset Management
+ |--------------------------------------------------------------------------
+ |
+ | Mix provides a clean, fluent API for defining some Webpack build steps
+ | for your Laravel applications. By default, we are compiling the CSS
+ | file for the application as well as bundling up all the JS files.
+ |
+ */
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+ mix.options({
+    postCss:[
+        require('autoprefixer'),
+    ],
+ })
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+mix.setPublicPath('public');
+mix.webpackConfig({
+    resolve:{
+        extensions:['.js', '.vue'],
+        alias:{
+            '@' :__dirname + 'resources'
+        }
+    },
+    output: {
+        chunkFilename: 'js/chunks/[name].js',
+    }
+}).react();
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+//used to run app using reactjs
+mix.js('resources/react-app/src/index.js', 'public/js/app.js').version();
+mix.copy('resources/react-app/public', 'public');
 
-## Learning Laravel
+```
+- After copied, run:
+```
+npm run dev
+```
+## Change the welcome.blade.php
+- Go to welcome.blade.php
+- Remove and replace the codes into body tag with the ``` div ``` tag with id named ``` root ```
+- Under the body tag write this javascript code
+```javascript
+<script type="text/javascript" src="{{ mix('js/app.js') }}"></script>
+```
+> Now you can run ``` php artisan serve ``` to start that app
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-## Laravel Sponsors
-
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
-
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### Note: 
+> Each time you change any thing in App.js you need to run the ``` npm run dev ``` again
+   
